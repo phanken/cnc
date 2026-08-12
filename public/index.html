@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d0f12">
+<title>Bộ đàm nhóm V5</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="box">
+  <h1>📻 Bộ đàm nhóm <small>V5 LOW LATENCY</small></h1>
+  <p class="sub">Một người nói • cả phòng tự nghe</p>
+
+  <div id="joinView">
+    <input id="room" placeholder="Mã phòng, ví dụ 1234">
+    <button id="join">VÀO PHÒNG</button>
+  </div>
+
+  <div id="radioView" class="hidden">
+    <div class="row">
+      <span>Phòng: <b id="roomName"></b></span>
+      <span>👥 <b id="count">1</b> máy</span>
+    </div>
+
+    <div id="status">Đang chờ máy khác...</div>
+
+    <button id="talk" class="talk" disabled>
+      <span>🎙️</span>
+      <b id="talkText">GIỮ ĐỂ NÓI</b>
+    </button>
+
+    <div class="buttons">
+      <button id="test">🎤 Test micro</button>
+      <button id="speaker">🔊 Loa: Bật</button>
+    </div>
+
+    <div class="meter"><i id="bar"></i></div>
+    <p id="info">Chế độ độ trễ thấp.</p>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

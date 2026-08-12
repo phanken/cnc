@@ -1,0 +1,16 @@
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0d0f12;color:white;font-family:system-ui,Arial;display:grid;place-items:center;padding:18px}
+.box{width:min(430px,100%);background:#191d22;border:1px solid #303640;border-radius:24px;padding:22px}
+h1{margin:0;font-size:24px}h1 small{font-size:11px;color:#60db93}
+.sub{color:#9ca6b2;margin-top:5px}
+input{width:100%;padding:15px;border-radius:12px;border:1px solid #3b424d;background:#0e1115;color:#fff;text-align:center;font-size:20px}
+button{cursor:pointer}.hidden{display:none}
+#join{width:100%;padding:14px;margin-top:10px;border:0;border-radius:12px;font-weight:800}
+.row{display:flex;justify-content:space-between;color:#bec6cf;font-size:14px}.row b{color:#fff}
+#status{text-align:center;margin:25px 0 12px;color:#9da7b4;font-weight:700}
+.talk{width:210px;height:210px;border-radius:50%;display:flex;margin:auto;align-items:center;justify-content:center;flex-direction:column;border:8px solid #343b44;font-size:18px;font-weight:900;touch-action:none}
+.talk span{font-size:48px}.talk.active{background:#60db93}.talk:disabled{opacity:.35}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.buttons button{padding:12px;border:1px solid #3a414c;background:#252b32;color:white;border-radius:12px}
+.meter{height:8px;margin-top:16px;background:#0c0f12;border-radius:99px;overflow:hidden}.meter i{display:block;width:0;height:100%;background:#ddd}
+#info{text-align:center;color:#9da7b4;font-size:13px;min-height:20px}
