@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quy đổi KG sang PCS</title>
+  <title>Quy đổi KG ↔ PCS</title>
   <style>
     *{box-sizing:border-box}
     body{
@@ -19,7 +19,7 @@
     }
     .card{
       width:100%;
-      max-width:520px;
+      max-width:560px;
       background:#fff;
       border-radius:20px;
       box-shadow:0 12px 40px rgba(0,0,0,.08);
@@ -27,34 +27,34 @@
     }
     h1{margin:0 0 8px;font-size:28px}
     .sub{margin:0 0 24px;color:#667085;line-height:1.5}
-    label{display:block;font-weight:700;margin:16px 0 8px}
+    .grid{display:grid;gap:16px}
+    .field{
+      padding:16px;
+      border:1px solid #e2e7ef;
+      border-radius:16px;
+      background:#fafbfe;
+    }
+    label{display:block;font-weight:700;margin-bottom:8px}
     input,select{
       width:100%;
       border:1px solid #d8dee9;
       border-radius:12px;
       padding:14px 15px;
-      font-size:17px;
+      font-size:19px;
       outline:none;
       background:#fff;
     }
-    input:focus,select:focus{border-color:#6b7cff;box-shadow:0 0 0 3px rgba(107,124,255,.12)}
-    .result{
-      margin-top:22px;
-      background:#f6f8ff;
-      border:1px solid #dfe4ff;
-      border-radius:16px;
-      padding:20px;
-      text-align:center;
+    input:focus,select:focus{
+      border-color:#6b7cff;
+      box-shadow:0 0 0 3px rgba(107,124,255,.12)
     }
-    .result .label{color:#667085;font-size:14px}
-    .result .value{
-      margin-top:6px;
-      font-size:42px;
-      font-weight:800;
-      letter-spacing:-1px;
+    .unit{
+      margin-top:7px;
+      font-size:13px;
+      color:#7a8497;
     }
-    .result .unit{font-size:18px;font-weight:700;color:#667085}
-    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+    .mode{margin-bottom:18px}
+    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
     button{
       border:0;
       border-radius:12px;
@@ -65,43 +65,52 @@
     }
     .primary{background:#172033;color:#fff}
     .secondary{background:#eef1f7;color:#172033}
-    .hint{font-size:13px;color:#7a8497;margin-top:8px;line-height:1.45}
     .formula{
       margin-top:16px;
       font-size:14px;
       padding:12px;
       border-radius:10px;
-      background:#fafafa;
+      background:#f6f8ff;
       color:#566074;
+      line-height:1.5;
     }
     @media(max-width:480px){
-      .card{padding:20px}
+      .card{padding:18px}
       h1{font-size:24px}
-      .result .value{font-size:36px}
     }
   </style>
 </head>
 <body>
   <main class="card">
-    <h1>Quy đổi KG → PCS</h1>
-    <p class="sub">Nhập trọng lượng và hệ số quy đổi để tính số lượng PCS.</p>
+    <h1>Quy đổi KG ↔ PCS</h1>
+    <p class="sub">Cả 3 ô đều có thể nhập. Nhập hoặc sửa một ô để tự tính các ô còn lại.</p>
 
-    <label for="kg">Số KG</label>
-    <input id="kg" type="number" min="0" step="any" inputmode="decimal" placeholder="Ví dụ: 125.5">
+    <div class="mode">
+      <label for="mode">Kiểu hệ số quy đổi</label>
+      <select id="mode">
+        <option value="kgPerPcs">1 PCS = ? KG</option>
+        <option value="pcsPerKg">1 KG = ? PCS</option>
+      </select>
+    </div>
 
-    <label for="mode">Kiểu quy đổi</label>
-    <select id="mode">
-      <option value="kgPerPcs">1 PCS = ? KG</option>
-      <option value="pcsPerKg">1 KG = ? PCS</option>
-    </select>
+    <div class="grid">
+      <div class="field">
+        <label for="kg">Số KG</label>
+        <input id="kg" type="number" min="0" step="any" inputmode="decimal" placeholder="Nhập số KG">
+        <div class="unit">Có thể nhập trực tiếp</div>
+      </div>
 
-    <label for="rate" id="rateLabel">Số KG cho 1 PCS</label>
-    <input id="rate" type="number" min="0" step="any" inputmode="decimal" placeholder="Ví dụ: 0.25">
-    <div class="hint" id="hint">Ví dụ: 1 PCS nặng 0.25 KG → nhập 0.25</div>
+      <div class="field">
+        <label for="rate" id="rateLabel">Số KG cho 1 PCS</label>
+        <input id="rate" type="number" min="0" step="any" inputmode="decimal" placeholder="Nhập hệ số quy đổi">
+        <div class="unit" id="rateHint">Ví dụ: 1 PCS = 0.25 KG</div>
+      </div>
 
-    <div class="result">
-      <div class="label">KẾT QUẢ</div>
-      <div><span class="value" id="result">0</span> <span class="unit">PCS</span></div>
+      <div class="field">
+        <label for="pcs">Số PCS</label>
+        <input id="pcs" type="number" min="0" step="any" inputmode="decimal" placeholder="Nhập số PCS">
+        <div class="unit">Có thể nhập trực tiếp</div>
+      </div>
     </div>
 
     <div class="buttons">
@@ -109,71 +118,116 @@
       <button class="secondary" id="resetBtn">Nhập lại</button>
     </div>
 
-    <div class="formula" id="formula">Công thức: PCS = KG ÷ KG/PCS</div>
+    <div class="formula" id="formula">
+      Nhập KG + hệ số → tính PCS<br>
+      Nhập PCS + hệ số → tính KG<br>
+      Nhập KG + PCS → tính hệ số
+    </div>
   </main>
 
 <script>
   const kg = document.getElementById('kg');
-  const mode = document.getElementById('mode');
   const rate = document.getElementById('rate');
-  const result = document.getElementById('result');
+  const pcs = document.getElementById('pcs');
+  const mode = document.getElementById('mode');
   const rateLabel = document.getElementById('rateLabel');
-  const hint = document.getElementById('hint');
-  const formula = document.getElementById('formula');
+  const rateHint = document.getElementById('rateHint');
 
-  let forceRound = false;
+  let lastEdited = 'kg';
+  let internalUpdate = false;
 
-  function fmt(n){
-    if (!Number.isFinite(n)) return '0';
-    if (forceRound) return Math.round(n).toLocaleString('vi-VN');
-    return n.toLocaleString('vi-VN', {maximumFractionDigits: 4});
+  function num(el){
+    const v = parseFloat(el.value);
+    return Number.isFinite(v) ? v : null;
   }
 
-  function calc(){
-    const k = parseFloat(kg.value);
-    const r = parseFloat(rate.value);
-    let pcs = 0;
+  function setVal(el, value, decimals = 6){
+    if (!Number.isFinite(value)) return;
+    internalUpdate = true;
+    let s = Number(value.toFixed(decimals)).toString();
+    el.value = s;
+    internalUpdate = false;
+  }
 
-    if (Number.isFinite(k) && k >= 0 && Number.isFinite(r) && r > 0){
-      pcs = mode.value === 'kgPerPcs' ? k / r : k * r;
+  function calculate(source){
+    if (internalUpdate) return;
+
+    const k = num(kg);
+    const r = num(rate);
+    const p = num(pcs);
+
+    if (mode.value === 'kgPerPcs') {
+      // PCS = KG / rate
+      // KG = PCS * rate
+      // rate = KG / PCS
+      if (source === 'kg') {
+        if (r !== null && r > 0) setVal(pcs, k / r);
+        else if (p !== null && p > 0) setVal(rate, k / p);
+      }
+      else if (source === 'rate') {
+        if (k !== null && k >= 0 && r > 0) setVal(pcs, k / r);
+        else if (p !== null && p >= 0 && r > 0) setVal(kg, p * r);
+      }
+      else if (source === 'pcs') {
+        if (r !== null && r > 0) setVal(kg, p * r);
+        else if (k !== null && p > 0) setVal(rate, k / p);
+      }
+    } else {
+      // PCS = KG * rate
+      // KG = PCS / rate
+      // rate = PCS / KG
+      if (source === 'kg') {
+        if (r !== null && r > 0) setVal(pcs, k * r);
+        else if (p !== null && k > 0) setVal(rate, p / k);
+      }
+      else if (source === 'rate') {
+        if (k !== null && k >= 0 && r > 0) setVal(pcs, k * r);
+        else if (p !== null && p >= 0 && r > 0) setVal(kg, p / r);
+      }
+      else if (source === 'pcs') {
+        if (r !== null && r > 0) setVal(kg, p / r);
+        else if (k !== null && k > 0) setVal(rate, p / k);
+      }
     }
-    result.textContent = fmt(pcs);
   }
 
-  function updateMode(){
-    forceRound = false;
+  ['kg','rate','pcs'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', ()=>{
+      lastEdited = id;
+      calculate(id);
+    });
+  });
+
+  mode.addEventListener('change', ()=>{
     if(mode.value === 'kgPerPcs'){
       rateLabel.textContent = 'Số KG cho 1 PCS';
-      rate.placeholder = 'Ví dụ: 0.25';
-      hint.textContent = 'Ví dụ: 1 PCS nặng 0.25 KG → nhập 0.25';
-      formula.textContent = 'Công thức: PCS = KG ÷ KG/PCS';
+      rateHint.textContent = 'Ví dụ: 1 PCS = 0.25 KG';
     }else{
       rateLabel.textContent = 'Số PCS trên 1 KG';
-      rate.placeholder = 'Ví dụ: 4';
-      hint.textContent = 'Ví dụ: 1 KG = 4 PCS → nhập 4';
-      formula.textContent = 'Công thức: PCS = KG × PCS/KG';
+      rateHint.textContent = 'Ví dụ: 1 KG = 4 PCS';
     }
-    calc();
-  }
-
-  kg.addEventListener('input', ()=>{forceRound=false;calc()});
-  rate.addEventListener('input', ()=>{forceRound=false;calc()});
-  mode.addEventListener('change', updateMode);
+    calculate(lastEdited);
+  });
 
   document.getElementById('roundBtn').addEventListener('click', ()=>{
-    forceRound = true;
-    calc();
+    const p = num(pcs);
+    if (p !== null){
+      internalUpdate = true;
+      pcs.value = Math.round(p);
+      internalUpdate = false;
+      calculate('pcs');
+    }
   });
 
   document.getElementById('resetBtn').addEventListener('click', ()=>{
+    internalUpdate = true;
     kg.value = '';
     rate.value = '';
-    forceRound = false;
-    result.textContent = '0';
+    pcs.value = '';
+    internalUpdate = false;
     kg.focus();
   });
-
-  updateMode();
 </script>
 </body>
 </html>
