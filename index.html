@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quy đổi KG ↔ PCS</title>
+  <title>Quy đổi KG → PCS</title>
   <style>
     *{box-sizing:border-box}
     body{
@@ -53,7 +53,6 @@
       font-size:13px;
       color:#7a8497;
     }
-    .mode{margin-bottom:18px}
     .buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
     button{
       border:0;
@@ -82,16 +81,9 @@
 </head>
 <body>
   <main class="card">
-    <h1>Quy đổi KG ↔ PCS</h1>
-    <p class="sub">Cả 3 ô đều có thể nhập. Nhập hoặc sửa một ô để tự tính các ô còn lại.</p>
+    <h1>Quy đổi KG → PCS</h1>
+    <p class="sub">Nhập KG, số PCS trên 1 KG hoặc tổng PCS. Cả 3 ô đều có thể nhập.</p>
 
-    <div class="mode">
-      <label for="mode">Kiểu hệ số quy đổi</label>
-      <select id="mode">
-        <option value="kgPerPcs">1 PCS = ? KG</option>
-        <option value="pcsPerKg">1 KG = ? PCS</option>
-      </select>
-    </div>
 
     <div class="grid">
       <div class="field">
@@ -101,9 +93,9 @@
       </div>
 
       <div class="field">
-        <label for="rate" id="rateLabel">Số KG cho 1 PCS</label>
+        <label for="rate">Số PCS trên 1 KG</label>
         <input id="rate" type="number" min="0" step="any" inputmode="decimal" placeholder="Nhập hệ số quy đổi">
-        <div class="unit" id="rateHint">Ví dụ: 1 PCS = 0.25 KG</div>
+        <div class="unit">Ví dụ: 1 KG = 4 PCS</div>
       </div>
 
       <div class="field">
@@ -129,11 +121,7 @@
   const kg = document.getElementById('kg');
   const rate = document.getElementById('rate');
   const pcs = document.getElementById('pcs');
-  const mode = document.getElementById('mode');
-  const rateLabel = document.getElementById('rateLabel');
-  const rateHint = document.getElementById('rateHint');
 
-  let lastEdited = 'kg';
   let internalUpdate = false;
 
   function num(el){
@@ -144,70 +132,32 @@
   function setVal(el, value, decimals = 6){
     if (!Number.isFinite(value)) return;
     internalUpdate = true;
-    let s = Number(value.toFixed(decimals)).toString();
-    el.value = s;
+    el.value = Number(value.toFixed(decimals)).toString();
     internalUpdate = false;
   }
 
   function calculate(source){
     if (internalUpdate) return;
-
     const k = num(kg);
     const r = num(rate);
     const p = num(pcs);
 
-    if (mode.value === 'kgPerPcs') {
-      // PCS = KG / rate
-      // KG = PCS * rate
-      // rate = KG / PCS
-      if (source === 'kg') {
-        if (r !== null && r > 0) setVal(pcs, k / r);
-        else if (p !== null && p > 0) setVal(rate, k / p);
-      }
-      else if (source === 'rate') {
-        if (k !== null && k >= 0 && r > 0) setVal(pcs, k / r);
-        else if (p !== null && p >= 0 && r > 0) setVal(kg, p * r);
-      }
-      else if (source === 'pcs') {
-        if (r !== null && r > 0) setVal(kg, p * r);
-        else if (k !== null && p > 0) setVal(rate, k / p);
-      }
-    } else {
-      // PCS = KG * rate
-      // KG = PCS / rate
-      // rate = PCS / KG
-      if (source === 'kg') {
-        if (r !== null && r > 0) setVal(pcs, k * r);
-        else if (p !== null && k > 0) setVal(rate, p / k);
-      }
-      else if (source === 'rate') {
-        if (k !== null && k >= 0 && r > 0) setVal(pcs, k * r);
-        else if (p !== null && p >= 0 && r > 0) setVal(kg, p / r);
-      }
-      else if (source === 'pcs') {
-        if (r !== null && r > 0) setVal(kg, p / r);
-        else if (k !== null && k > 0) setVal(rate, p / k);
-      }
+    // PCS = KG × PCS/KG
+    if (source === 'kg') {
+      if (k !== null && r !== null && r > 0) setVal(pcs, k * r);
+      else if (k !== null && k > 0 && p !== null) setVal(rate, p / k);
+    } else if (source === 'rate') {
+      if (k !== null && r !== null && r > 0) setVal(pcs, k * r);
+      else if (p !== null && r !== null && r > 0) setVal(kg, p / r);
+    } else if (source === 'pcs') {
+      if (p !== null && r !== null && r > 0) setVal(kg, p / r);
+      else if (p !== null && k !== null && k > 0) setVal(rate, p / k);
     }
   }
 
   ['kg','rate','pcs'].forEach(id=>{
     const el = document.getElementById(id);
-    el.addEventListener('input', ()=>{
-      lastEdited = id;
-      calculate(id);
-    });
-  });
-
-  mode.addEventListener('change', ()=>{
-    if(mode.value === 'kgPerPcs'){
-      rateLabel.textContent = 'Số KG cho 1 PCS';
-      rateHint.textContent = 'Ví dụ: 1 PCS = 0.25 KG';
-    }else{
-      rateLabel.textContent = 'Số PCS trên 1 KG';
-      rateHint.textContent = 'Ví dụ: 1 KG = 4 PCS';
-    }
-    calculate(lastEdited);
+    el.addEventListener('input', ()=> calculate(id));
   });
 
   document.getElementById('roundBtn').addEventListener('click', ()=>{
