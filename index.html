@@ -123,6 +123,7 @@
   const pcs = document.getElementById('pcs');
 
   let internalUpdate = false;
+  let lastUserField = null;
 
   function num(el){
     const v = parseFloat(el.value);
@@ -136,28 +137,58 @@
     internalUpdate = false;
   }
 
-  function calculate(source){
+  function calculate(currentField){
     if (internalUpdate) return;
+
     const k = num(kg);
     const r = num(rate);
     const p = num(pcs);
 
-    // PCS = KG × PCS/KG
-    if (source === 'kg') {
-      if (k !== null && r !== null && r > 0) setVal(pcs, k * r);
-      else if (k !== null && k > 0 && p !== null) setVal(rate, p / k);
-    } else if (source === 'rate') {
-      if (k !== null && r !== null && r > 0) setVal(pcs, k * r);
-      else if (p !== null && r !== null && r > 0) setVal(kg, p / r);
-    } else if (source === 'pcs') {
-      if (p !== null && r !== null && r > 0) setVal(kg, p / r);
-      else if (p !== null && k !== null && k > 0) setVal(rate, p / k);
+    // Dùng 2 ô người dùng vừa sửa gần nhất để tính ô còn lại.
+    const pair = new Set([lastUserField, currentField]);
+
+    if (pair.has('kg') && pair.has('pcs')) {
+      // KG + PCS => hệ số PCS/KG
+      if (k !== null && k > 0 && p !== null) {
+        setVal(rate, p / k);
+      }
+    } else if (pair.has('kg') && pair.has('rate')) {
+      // KG + hệ số => tổng PCS
+      if (k !== null && r !== null && r >= 0) {
+        setVal(pcs, k * r);
+      }
+    } else if (pair.has('pcs') && pair.has('rate')) {
+      // PCS + hệ số => KG
+      if (p !== null && r !== null && r > 0) {
+        setVal(kg, p / r);
+      }
+    } else {
+      // Khi mới nhập ô đầu tiên, nếu đã có một ô khác thì tính theo cặp hợp lý.
+      if (currentField === 'kg') {
+        if (p !== null && k !== null && k > 0) setVal(rate, p / k);
+        else if (r !== null && k !== null) setVal(pcs, k * r);
+      } else if (currentField === 'pcs') {
+        if (k !== null && k > 0 && p !== null) setVal(rate, p / k);
+        else if (r !== null && r > 0 && p !== null) setVal(kg, p / r);
+      } else if (currentField === 'rate') {
+        if (k !== null && r !== null) setVal(pcs, k * r);
+        else if (p !== null && r !== null && r > 0) setVal(kg, p / r);
+      }
     }
+
+    lastUserField = currentField;
   }
 
   ['kg','rate','pcs'].forEach(id=>{
     const el = document.getElementById(id);
-    el.addEventListener('input', ()=> calculate(id));
+
+    el.addEventListener('focus', ()=>{
+      // Không đổi lastUserField ở đây để vẫn biết ô nào vừa được sửa trước đó.
+    });
+
+    el.addEventListener('input', ()=>{
+      calculate(id);
+    });
   });
 
   document.getElementById('roundBtn').addEventListener('click', ()=>{
@@ -166,7 +197,17 @@
       internalUpdate = true;
       pcs.value = Math.round(p);
       internalUpdate = false;
-      calculate('pcs');
+
+      // Sau khi làm tròn PCS, ưu tiên tính lại hệ số nếu KG đang có.
+      const k = num(kg);
+      if (k !== null && k > 0) {
+        setVal(rate, Math.round(p) / k);
+      } else {
+        const r = num(rate);
+        if (r !== null && r > 0) setVal(kg, Math.round(p) / r);
+      }
+
+      lastUserField = 'pcs';
     }
   });
 
@@ -176,6 +217,7 @@
     rate.value = '';
     pcs.value = '';
     internalUpdate = false;
+    lastUserField = null;
     kg.focus();
   });
 </script>
